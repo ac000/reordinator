@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=reordinator
+Comment=reorder lines in a file
+Exec=reordinator %U
+Terminal=false
+Type=Application
+Categories=Utility;
+MimeType=text/plain;
+Icon=reordinator
