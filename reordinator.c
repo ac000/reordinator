@@ -279,6 +279,7 @@ void cb_move_up(GtkWidget *button, struct widgets *widgets)
 	gtk_tree_model_get_iter(model, &parent, path);
 	gtk_list_store_move_after(widgets->liststore, &iter, &parent);
 
+	gtk_tree_path_free(path);
 	update_window_title(widgets->window, true);
 }
 
@@ -316,6 +317,7 @@ void cb_move_down(GtkWidget *button, struct widgets *widgets)
 	gtk_tree_model_get_iter(model, &parent, path);
 	gtk_list_store_move_before(widgets->liststore, &iter, &parent);
 
+	gtk_tree_path_free(path);
 	update_window_title(widgets->window, true);
 }
 
