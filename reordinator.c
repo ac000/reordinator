@@ -247,6 +247,22 @@ void cb_delete(GtkWidget *button, struct widgets *widgets)
 	update_window_title(widgets->window, true);
 }
 
+void cb_move_to_top(GtkWidget *button, struct widgets *widgets)
+{
+	GtkTreeSelection *selection;
+	GtkTreeModel *model;
+	GtkTreeIter iter;
+	GtkTreeIter parent;
+
+	selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(
+				widgets->treeview));
+	gtk_tree_selection_get_selected(selection, &model, &iter);
+	gtk_tree_model_get_iter_first(model, &parent);
+	gtk_list_store_move_before(widgets->liststore, &iter, &parent);
+
+	update_window_title(widgets->window, true);
+}
+
 void cb_move_up(GtkWidget *button, struct widgets *widgets)
 {
 	GtkTreeSelection *selection;
@@ -261,6 +277,24 @@ void cb_move_up(GtkWidget *button, struct widgets *widgets)
 	path = gtk_tree_model_get_path(model, &iter);
 	gtk_tree_model_iter_previous(model, &iter);
 	gtk_tree_model_get_iter(model, &parent, path);
+	gtk_list_store_move_after(widgets->liststore, &iter, &parent);
+
+	update_window_title(widgets->window, true);
+}
+
+void cb_move_to_bottom(GtkWidget *button, struct widgets *widgets)
+{
+	GtkTreeSelection *selection;
+	GtkTreeModel *model;
+	GtkTreeIter iter;
+	GtkTreeIter parent;
+	gint nr_rows;
+
+	selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(
+				widgets->treeview));
+	gtk_tree_selection_get_selected(selection, &model, &iter);
+	nr_rows = gtk_tree_model_iter_n_children(model, NULL);
+	gtk_tree_model_iter_nth_child(model, &parent, NULL, nr_rows - 1);
 	gtk_list_store_move_after(widgets->liststore, &iter, &parent);
 
 	update_window_title(widgets->window, true);
