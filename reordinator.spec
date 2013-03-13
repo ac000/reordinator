@@ -36,8 +36,8 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/pixmaps/reordinator.png
 
 %changelog
-* Wed Mar 13 2013 Andrew Clayton <andrew@pccl.info> - 002-1
+* Wed Mar 13 2013 Andrew Clayton <andrew@digital-domain.net> - 002-1
 - Update to new version
 
-* Mon Mar 11 2013 Andrew Clayton <andrew@pccl.info> - 001-1
+* Mon Mar 11 2013 Andrew Clayton <andrew@digital-domain.net> - 001-1
 - Initial version
