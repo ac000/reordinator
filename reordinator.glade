@@ -8,6 +8,7 @@
     <property name="program_name">reordinator</property>
     <property name="version">001</property>
     <property name="copyright" translatable="yes">Copyright © 2013 Andrew Clayton</property>
+    <property name="comments" translatable="yes">Re-order lines in a file.</property>
     <property name="website">https://github.com/ac000/reordinator</property>
     <property name="authors">Andrew Clayton &lt;andrew@digital-domain.net&gt;</property>
     <property name="artists">Andrew Clayton &lt;andrew@digital-domain.net&gt;</property>
