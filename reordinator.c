@@ -34,7 +34,7 @@ struct widgets {
 	GtkWidget *save_error;
 	GtkWidget *about;
 	GtkListStore *liststore;
-} widgets;
+};
 
 static char loaded_file[PATH_MAX];
 static bool file_modified;
