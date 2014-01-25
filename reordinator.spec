@@ -1,6 +1,6 @@
 Summary:	Reorder lines in a file
 Name:		reordinator
-Version:	002
+Version:	003
 Release:	1%{?dist}
 Group:		Development/Tools
 License:	GPLv2
@@ -36,6 +36,9 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/pixmaps/reordinator.png
 
 %changelog
+* Sat Jan 25 2014 Andrew Clayton <andrew@digital-domain.net> - 003-1
+- Update to new version
+
 * Wed Mar 13 2013 Andrew Clayton <andrew@digital-domain.net> - 002-1
 - Update to new version
 
