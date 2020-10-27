@@ -1,7 +1,7 @@
 /*
  * reordinator.c - A program to help with re-ordering lines in a file
  *
- * Copyright (C) 2013		Andrew Clayton <andrew@digital-domain.net>
+ * Copyright (C) 2013, 2020	Andrew Clayton <andrew@digital-domain.net>
  *
  * Released under the GNU General Public License version 2
  * See COPYING
@@ -34,10 +34,13 @@ struct widgets {
 	GtkWidget *save_error;
 	GtkWidget *about;
 	GtkListStore *liststore;
+
+	gulong sig;
 };
 
 static char loaded_file[PATH_MAX];
 static bool file_modified;
+static int last_row_selected;
 
 static GList *create_path_refs(GList *rows, gint nrows, GtkTreeModel *model)
 {
@@ -78,6 +81,11 @@ static void load_file(const char *file, struct widgets *widgets)
 	char line[BUF_SIZE];
 	GtkTreeIter iter;
 
+	/*
+	 * Temporarily block the "row-changed" signal while we load in
+	 * the data.
+	 */
+	g_signal_handler_block(widgets->liststore, widgets->sig);
 	gtk_list_store_clear(widgets->liststore);
 
 	fp = fopen(file, "r");
@@ -93,6 +101,7 @@ static void load_file(const char *file, struct widgets *widgets)
 
 	snprintf(loaded_file, sizeof(loaded_file), "%s", file);
 	update_window_title(widgets->window, false);
+	g_signal_handler_unblock(widgets->liststore, widgets->sig);
 }
 
 static void file_open(struct widgets *widgets)
@@ -423,6 +432,45 @@ void cb_move_down(GtkWidget *button, struct widgets *widgets)
 	update_window_title(widgets->window, true);
 }
 
+void cb_update(GtkTreeModel *tree_model, GtkTreePath *path,
+	       GtkTreeIter *iter, gpointer user_data)
+{
+	char *pathstr = gtk_tree_path_to_string(path);
+
+	if (atoi(pathstr) != last_row_selected)
+		update_window_title(user_data, true);
+
+	free(pathstr);
+}
+
+/*
+ * This call-back only exists so that we can tell what the last
+ * selected row was so if we drag a row but drop it back on itself,
+ * we wont mark the file as having been updated.
+ */
+void cb_change(GtkWidget *widget, gpointer label)
+{
+	GtkTreeModel *model;
+	GtkTreeRowReference *ref;
+	GtkTreePath *path;
+	char *pathstr;
+	GList *rows;
+	GList *refs;
+
+	/* XXX: There must be a better way ...? */
+	rows = gtk_tree_selection_get_selected_rows(GTK_TREE_SELECTION(widget),
+						    &model);
+	refs = create_path_refs(rows, 1, model);
+	ref = g_list_nth_data(refs, 0);
+	path = gtk_tree_row_reference_get_path(ref);
+	pathstr = gtk_tree_path_to_string(path);
+	last_row_selected = pathstr ? atoi(pathstr) : -1;
+
+	free(pathstr);
+	g_list_free_full(rows, (GDestroyNotify)gtk_tree_path_free);
+	g_list_free_full(refs, (GDestroyNotify)gtk_tree_row_reference_free);
+}
+
 static void get_widgets(struct widgets *widgets, GtkBuilder *builder)
 {
 	widgets->window = GTK_WIDGET(gtk_builder_get_object(builder,
@@ -441,6 +489,11 @@ static void get_widgets(struct widgets *widgets, GtkBuilder *builder)
 				"messagedialog2"));
 	widgets->about = GTK_WIDGET(gtk_builder_get_object(builder,
 				"aboutdialog1"));
+
+	widgets->sig = g_signal_connect(G_OBJECT(widgets->liststore),
+					"row-changed",
+					G_CALLBACK(cb_update),
+					widgets->window);
 }
 
 int main(int argc, char **argv)
