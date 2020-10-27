@@ -69,10 +69,7 @@ static void update_window_title(GtkWidget *window, bool modified)
 			(modified) ? '*' : ' ', loaded_file);
 	gtk_window_set_title(GTK_WINDOW(window), title);
 
-	if (modified)
-		file_modified = true;
-	else
-		file_modified = false;
+	file_modified = modified;
 }
 
 static void load_file(const char *file, struct widgets *widgets)
@@ -174,21 +171,20 @@ void cb_confirm_quit(struct widgets *widgets)
 	gtk_widget_hide(widgets->confirm_quit);
 }
 
+static void do_quit(struct widgets *widgets)
+{
+	return file_modified ? cb_confirm_quit(widgets) : gtk_main_quit();
+}
+
 void cb_window_destroy(GtkWidget *widget, GdkEvent *event,
 		       struct widgets *widgets)
 {
-	if (!file_modified)
-		gtk_main_quit();
-	else
-		cb_confirm_quit(widgets);
+	do_quit(widgets);
 }
 
 void cb_menu_quit(GtkMenuItem *menuitem, struct widgets *widgets)
 {
-	if (!file_modified)
-		gtk_main_quit();
-	else
-		cb_confirm_quit(widgets);
+	do_quit(widgets);
 }
 
 void cb_save_file(GtkMenuItem *menuitem, struct widgets *widgets)
