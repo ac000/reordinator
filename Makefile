@@ -1,14 +1,11 @@
-CC=gcc
-CFLAGS=-Wall -g -O2 -std=c99
-LDFLAGS=
-LIBS=`pkg-config --libs gtk+-3.0 glib-2.0 gmodule-2.0`
-INCS=`pkg-config --cflags gtk+-3.0 glib-2.0 gmodule-2.0`
+CC	= gcc
+CFLAGS	= -Wall -g -O2 -std=c99 \
+	  $(shell pkg-config --cflags gtk+-3.0 glib-2.0 gmodule-2.0)
+LDFLAGS	=
+LIBS	= $(shell pkg-config --libs gtk+-3.0 glib-2.0 gmodule-2.0)
 
-reordinator: reordinator.o
-	$(CC) ${LDFLAGS} -o reordinator reordinator.o ${LIBS}
-
-reordinator.o: reordinator.c
-	$(CC) $(CFLAGS) -c reordinator.c ${INCS}
+reordinator: reordinator.c
+	$(CC) $(CFLAGS) ${LDFLAGS} ${LIBS} -o $@ $<
 
 clean:
-	rm -f reordinator *.o
+	rm -f reordinator
