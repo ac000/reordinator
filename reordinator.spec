@@ -1,6 +1,6 @@
 Summary:	Reorder lines in a file
 Name:		reordinator
-Version:	004
+Version:	005
 Release:	1%{?dist}
 Group:		Development/Tools
 License:	GPLv2
@@ -36,6 +36,10 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/pixmaps/reordinator.png
 
 %changelog
+
+* Wed Oct 28 2020 Andrew Clayton <andrew@digital-domain.net> - 005-1
+- Some cleanups and minor fixes.
+
 * Tue Apr 14 2015 Andrew Clayton <andrew@digital-domain.net> - 004-1
 - Allow rows to be reordered simply by dragging them.
 - Use a better sized PNG for the icon rather than just the large SVG.
