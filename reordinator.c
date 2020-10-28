@@ -7,7 +7,8 @@
  * See COPYING
  */
 
-#define _XOPEN_SOURCE		/* for fileno() */
+#define _POSIX_C_SOURCE 200809L		/* openat(2), renameat(2) */
+#define _XOPEN_SOURCE	500		/* fileno(3), strdup(3) */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -15,8 +16,10 @@
 #include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <fcntl.h>
 #include <unistd.h>
-#include <limits.h>
+#include <libgen.h>
+#include <linux/limits.h>
 
 #include <glib.h>
 
@@ -192,18 +195,38 @@ void cb_save_file(GtkMenuItem *menuitem, struct widgets *widgets)
 	FILE *fp;
 	GtkTreeModel *model;
 	GtkTreeIter iter;
-	char tmp_file[PATH_MAX];
+	char *dird;
+	char *dname;
+	char *based;
+	char *bname;
+	char tmp_file[NAME_MAX + 1];
+	int dfd;
+	int fd;
+	int err;
 
 	if (strlen(loaded_file) == 0)
 		return;
 
-	snprintf(tmp_file, sizeof(tmp_file), "%s.%d.tmp", loaded_file,
-			getpid());
-	fp = fopen(tmp_file, "w");
+	/*
+	 * Split loaded_file into its directory and filename components.
+	 * This lets us
+	 *
+	 *   1) Use the openat(2) and renameat(2) system calls
+	 *   2) Use NAME_MAX rather than PATH_MAX for the filename length
+	 */
+	dird = strdup(loaded_file);
+	dname = dirname(dird);
+	based = strdup(loaded_file);
+	bname = basename(based);
+	snprintf(tmp_file, sizeof(tmp_file), ".%s.%d.tmp", bname, getpid());
+
+	dfd = open(dname, O_DIRECTORY);
+	fd = openat(dfd, tmp_file, O_WRONLY|O_CREAT|O_TRUNC|O_EXCL, 0666);
+	fp = fdopen(fd, "w");
 	if (!fp) {
 		gtk_dialog_run(GTK_DIALOG(widgets->save_error));
 		gtk_widget_hide(widgets->save_error);
-		return;
+		goto out_free;
 	}
 
 	model = GTK_TREE_MODEL(widgets->liststore);
@@ -218,8 +241,19 @@ void cb_save_file(GtkMenuItem *menuitem, struct widgets *widgets)
 	fsync(fileno(fp));
 	fclose(fp);
 
-	rename(tmp_file, loaded_file);
+	err = renameat(dfd, tmp_file, dfd, bname);
+	if (err) {
+		gtk_dialog_run(GTK_DIALOG(widgets->save_error));
+		gtk_widget_hide(widgets->save_error);
+		goto out_free;
+	}
+
 	update_window_title(widgets->window, false);
+
+out_free:
+	close(dfd);
+	free(dird);
+	free(based);
 }
 
 void cb_save_as(GtkMenuItem *menuitem, struct widgets *widgets)
