@@ -25,6 +25,8 @@
 
 #include <gtk/gtk.h>
 
+#define __unused	__attribute__((unused))
+
 #define BUF_SIZE	4096
 #define PROG_NAME	"reordinator"
 
@@ -152,7 +154,7 @@ static void save_file_as(struct widgets *widgets)
 	g_free(filename);
 }
 
-void cb_about(GtkWidget *button, struct widgets *widgets)
+void cb_about(GtkWidget *button __unused, struct widgets *widgets)
 {
         gtk_dialog_run(GTK_DIALOG(widgets->about));
         gtk_widget_hide(widgets->about);
@@ -179,18 +181,18 @@ static void do_quit(struct widgets *widgets)
 	return file_modified ? cb_confirm_quit(widgets) : gtk_main_quit();
 }
 
-void cb_window_destroy(GtkWidget *widget, GdkEvent *event,
+void cb_window_destroy(GtkWidget *widget __unused, GdkEvent *event __unused,
 		       struct widgets *widgets)
 {
 	do_quit(widgets);
 }
 
-void cb_menu_quit(GtkMenuItem *menuitem, struct widgets *widgets)
+void cb_menu_quit(GtkMenuItem *menuitem __unused, struct widgets *widgets)
 {
 	do_quit(widgets);
 }
 
-void cb_save_file(GtkMenuItem *menuitem, struct widgets *widgets)
+void cb_save_file(GtkMenuItem *menuitem __unused, struct widgets *widgets)
 {
 	FILE *fp;
 	GtkTreeModel *model;
@@ -256,7 +258,7 @@ out_free:
 	free(based);
 }
 
-void cb_save_as(GtkMenuItem *menuitem, struct widgets *widgets)
+void cb_save_as(GtkMenuItem *menuitem __unused, struct widgets *widgets)
 {
 	int response;
 
@@ -275,7 +277,7 @@ void cb_save_as(GtkMenuItem *menuitem, struct widgets *widgets)
 	gtk_widget_hide(widgets->filechooser_save);
 }
 
-void cb_open(GtkMenuItem *menuitem, struct widgets *widgets)
+void cb_open(GtkMenuItem *menuitem __unused, struct widgets *widgets)
 {
 	int response;
 
@@ -291,7 +293,7 @@ void cb_open(GtkMenuItem *menuitem, struct widgets *widgets)
 	gtk_widget_hide(widgets->filechooser_open);
 }
 
-void cb_delete(GtkWidget *button, struct widgets *widgets)
+void cb_delete(GtkWidget *button __unused, struct widgets *widgets)
 {
 	GtkTreeSelection *selection;
 	GtkTreeModel *model = GTK_TREE_MODEL(widgets->liststore);
@@ -322,7 +324,7 @@ void cb_delete(GtkWidget *button, struct widgets *widgets)
 	update_window_title(widgets->window, true);
 }
 
-void cb_move_to_top(GtkWidget *button, struct widgets *widgets)
+void cb_move_to_top(GtkWidget *button __unused, struct widgets *widgets)
 {
 	GtkTreeSelection *selection;
 	GtkTreeModel *model = GTK_TREE_MODEL(widgets->liststore);
@@ -357,7 +359,7 @@ void cb_move_to_top(GtkWidget *button, struct widgets *widgets)
 	update_window_title(widgets->window, true);
 }
 
-void cb_move_up(GtkWidget *button, struct widgets *widgets)
+void cb_move_up(GtkWidget *button __unused, struct widgets *widgets)
 {
 	GtkTreeSelection *selection;
 	GtkTreeModel *model = GTK_TREE_MODEL(widgets->liststore);
@@ -391,7 +393,7 @@ void cb_move_up(GtkWidget *button, struct widgets *widgets)
 	update_window_title(widgets->window, true);
 }
 
-void cb_move_to_bottom(GtkWidget *button, struct widgets *widgets)
+void cb_move_to_bottom(GtkWidget *button __unused, struct widgets *widgets)
 {
 	GtkTreeSelection *selection;
 	GtkTreeModel *model = GTK_TREE_MODEL(widgets->liststore);
@@ -427,7 +429,7 @@ void cb_move_to_bottom(GtkWidget *button, struct widgets *widgets)
 	update_window_title(widgets->window, true);
 }
 
-void cb_move_down(GtkWidget *button, struct widgets *widgets)
+void cb_move_down(GtkWidget *button __unused, struct widgets *widgets)
 {
 	GtkTreeSelection *selection;
 	GtkTreeModel *model = GTK_TREE_MODEL(widgets->liststore);
@@ -462,8 +464,8 @@ void cb_move_down(GtkWidget *button, struct widgets *widgets)
 	update_window_title(widgets->window, true);
 }
 
-void cb_update(GtkTreeModel *tree_model, GtkTreePath *path,
-	       GtkTreeIter *iter, gpointer user_data)
+void cb_update(GtkTreeModel *tree_model __unused, GtkTreePath *path,
+	       GtkTreeIter *iter __unused, gpointer user_data)
 {
 	char *pathstr = gtk_tree_path_to_string(path);
 
@@ -478,7 +480,7 @@ void cb_update(GtkTreeModel *tree_model, GtkTreePath *path,
  * selected row was so if we drag a row but drop it back on itself,
  * we wont mark the file as having been updated.
  */
-void cb_change(GtkWidget *widget, gpointer label)
+void cb_change(GtkWidget *widget, gpointer label __unused)
 {
 	GtkTreeModel *model;
 	GtkTreeRowReference *ref;
