@@ -222,7 +222,7 @@ void cb_save_file(GtkMenuItem *menuitem __unused, struct widgets *widgets)
 	bname = basename(based);
 	snprintf(tmp_file, sizeof(tmp_file), ".%s.%d.tmp", bname, getpid());
 
-	dfd = open(dname, O_DIRECTORY);
+	dfd = open(dname, O_RDONLY);
 	fd = openat(dfd, tmp_file, O_WRONLY|O_CREAT|O_TRUNC|O_EXCL, 0666);
 	fp = fdopen(fd, "w");
 	if (!fp) {
